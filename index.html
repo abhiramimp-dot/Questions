@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mathematics Diagnostic Assessment (MYA)</title>
+<title>Adaptive Grade 7–8 Mathematics Assessment (45-Min MYA)</title>
 
 <style>
 * {
@@ -24,6 +24,7 @@ body {
     padding: 30px;
     border-radius: 18px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.10);
+    position: relative;
 }
 
 h1 {
@@ -75,10 +76,20 @@ h1 {
 .status-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-weight: bold;
     color: #555;
     margin-bottom: 15px;
     font-size: 14px;
+}
+
+.timer-badge {
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-family: monospace;
+    font-size: 15px;
 }
 
 .question {
@@ -167,6 +178,18 @@ button {
     background: #1d4ed8;
 }
 
+.alert-toast {
+    display: none;
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-align: center;
+}
+
 #result {
     display: none;
     text-align: center;
@@ -222,11 +245,13 @@ button {
 
 <div class="container">
 
-<h1>Mathematics Assessment</h1>
+<h1>Adaptive Grade 7–8 Mathematics Assessment</h1>
 
 <div class="subtitle">
-Middle Year Assessment (MYA) — Computerized Adaptive Test
+Middle Year Assessment (MYA) — 45-Minute CAT
 </div>
+
+<div id="alertToast" class="alert-toast"></div>
 
 <!-- Start Section -->
 <div id="startSection">
@@ -234,7 +259,7 @@ Middle Year Assessment (MYA) — Computerized Adaptive Test
         <label for="studentName">Student Name</label>
         <input type="text" id="studentName" placeholder="Enter your full name">
     </div>
-    <button class="primary-btn" onclick="startTest()">Start Adaptive Test</button>
+    <button class="primary-btn" onclick="startTest()">Start 45-Minute Adaptive Test (20 Questions)</button>
 </div>
 
 <!-- Test Section -->
@@ -244,7 +269,8 @@ Middle Year Assessment (MYA) — Computerized Adaptive Test
     </div>
 
     <div class="status-header">
-        <span id="questionCount">Question 1 of 10</span>
+        <span id="questionCount">Question 1 of 20</span>
+        <span id="timerDisplay" class="timer-badge">⏱ 45:00</span>
         <span id="currentLevelDisplay">Current Level: Medium</span>
     </div>
 
@@ -309,12 +335,21 @@ Middle Year Assessment (MYA) — Computerized Adaptive Test
 </div>
 
 <script>
-// Helper SVG Grid Generator
+// Notification Helper
+function showAlert(message) {
+    const toast = document.getElementById("alertToast");
+    toast.innerText = message;
+    toast.style.display = "block";
+    setTimeout(() => {
+        toast.style.display = "none";
+    }, 3500);
+}
+
+// SVG Grid Generator
 function generateSVGGrid(points = [], lines = []) {
     let svg = `<svg width="260" height="260" viewBox="-130 -130 260 260" xmlns="http://www.w3.org/2000/svg">`;
     svg += `<rect x="-130" y="-130" width="260" height="260" fill="#f8fafc"/>`;
     
-    // Gridlines
     for (let i = -5; i <= 5; i++) {
         let pos = i * 20;
         let strokeColor = (i === 0) ? "#334155" : "#e2e8f0";
@@ -329,13 +364,11 @@ function generateSVGGrid(points = [], lines = []) {
         }
     }
     
-    // Axes Arrows
     svg += `<path d="M 0 -125 L -4 -115 L 4 -115 Z" fill="#334155"/>`;
     svg += `<path d="M 125 0 L 115 -4 L 115 4 Z" fill="#334155"/>`;
     svg += `<text x="115" y="-8" font-size="11" font-weight="bold" fill="#334155">x</text>`;
     svg += `<text x="8" y="-115" font-size="11" font-weight="bold" fill="#334155">y</text>`;
 
-    // Lines
     lines.forEach(l => {
         let x1 = l.x1 * 20;
         let y1 = -l.y1 * 20;
@@ -344,7 +377,6 @@ function generateSVGGrid(points = [], lines = []) {
         svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${l.color || '#2563eb'}" stroke-width="2.5" />`;
     });
 
-    // Points
     points.forEach(p => {
         let cx = p.x * 20;
         let cy = -p.y * 20;
@@ -358,152 +390,55 @@ function generateSVGGrid(points = [], lines = []) {
     return svg;
 }
 
-// Adaptive Question Bank
+// Extended Question Bank
 const questionBank = {
-    1: [ // Easy Level
-        { 
-            id: "e1", 
-            text: "What are the coordinates of point A plotted on the grid below?", 
-            svg: generateSVGGrid([{x: 3, y: 2, label: "A"}]),
-            options: ["(3, 2)", "(2, 3)", "(−3, 2)", "(3, −2)"], 
-            answer: "A", 
-            topic: "Coordinate Geometry" 
-        },
-        { 
-            id: "e2", 
-            text: "In which quadrant does the point (−4, 3) lie?", 
-            options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"], 
-            answer: "B", 
-            topic: "Coordinate Geometry" 
-        },
-        { 
-            id: "e3", 
-            text: "What is −8 + 13?", 
-            options: ["−21", "−5", "5", "21"], 
-            answer: "C", 
-            topic: "Number" 
-        },
-        { 
-            id: "e4", 
-            text: "Simplify: 3x + 5x.", 
-            options: ["8", "8x", "15x", "2x"], 
-            answer: "B", 
-            topic: "Algebra" 
-        },
-        { 
-            id: "e5", 
-            text: "Solve: x + 7 = 15.", 
-            options: ["7", "8", "9", "22"], 
-            answer: "B", 
-            topic: "Algebra" 
-        },
-        { 
-            id: "e6", 
-            text: "What is 25% of 80?", 
-            options: ["15", "20", "25", "30"], 
-            answer: "B", 
-            topic: "Ratio" 
-        }
+    1: [ // Easy
+        { id: "e1", text: "What are the coordinates of point A plotted on the grid below?", svg: generateSVGGrid([{x: 3, y: 2, label: "A"}]), options: ["(3, 2)", "(2, 3)", "(−3, 2)", "(3, −2)"], answer: "A", topic: "Coordinate Geometry" },
+        { id: "e2", text: "In which quadrant does the point (−4, 3) lie?", options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"], answer: "B", topic: "Coordinate Geometry" },
+        { id: "e3", text: "What are the coordinates of the origin on a Cartesian grid?", svg: generateSVGGrid([{x: 0, y: 0, label: "O"}]), options: ["(1, 1)", "(0, 1)", "(0, 0)", "(1, 0)"], answer: "C", topic: "Coordinate Geometry" },
+        { id: "e4", text: "If a point lies on the x-axis, what must its y-coordinate be?", options: ["0", "1", "−1", "Any positive number"], answer: "A", topic: "Coordinate Geometry" },
+        { id: "e5", text: "What are the coordinates of point B shown on the grid below?", svg: generateSVGGrid([{x: -3, y: -2, label: "B"}]), options: ["(3, 2)", "(−3, 2)", "(−3, −2)", "(−2, −3)"], answer: "C", topic: "Coordinate Geometry" },
+        { id: "e6", text: "Which axis runs horizontally across the coordinate grid?", options: ["x-axis", "y-axis", "z-axis", "Origin axis"], answer: "A", topic: "Coordinate Geometry" },
+        { id: "e7", text: "What is −8 + 13?", options: ["−21", "−5", "5", "21"], answer: "C", topic: "Number" },
+        { id: "e8", text: "Simplify: 3x + 5x.", options: ["8", "8x", "15x", "2x"], answer: "B", topic: "Algebra" },
+        { id: "e9", text: "Solve: x + 7 = 15.", options: ["7", "8", "9", "22"], answer: "B", topic: "Algebra" },
+        { id: "e10", text: "What is 25% of 80?", options: ["15", "20", "25", "30"], answer: "B", topic: "Ratio" }
     ],
-    2: [ // Medium Level
-        { 
-            id: "m1", 
-            text: "Find the distance between Point A (−2, 3) and Point B (4, 3).", 
-            svg: generateSVGGrid([{x: -2, y: 3, label: "A"}, {x: 4, y: 3, label: "B"}], [{x1: -2, y1: 3, x2: 4, y2: 3, color: "#93c5fd"}]),
-            options: ["2 units", "4 units", "6 units", "8 units"], 
-            answer: "C", 
-            topic: "Coordinate Geometry" 
-        },
-        { 
-            id: "m2", 
-            text: "What is the gradient (slope) of the line passing through (0, 1) and (2, 5)?", 
-            options: ["1", "2", "3", "4"], 
-            answer: "B", 
-            topic: "Coordinate Geometry" 
-        },
-        { 
-            id: "m3", 
-            text: "Which equation represents a straight line passing through the origin with slope 3?", 
-            options: ["y = x + 3", "y = 3x", "y = 3", "x = 3y"], 
-            answer: "B", 
-            topic: "Coordinate Geometry" 
-        },
-        { 
-            id: "m4", 
-            text: "What is the HCF of 18 and 24?", 
-            options: ["3", "6", "9", "12"], 
-            answer: "B", 
-            topic: "Number" 
-        },
-        { 
-            id: "m5", 
-            text: "Expand: 3(x + 4).", 
-            options: ["3x + 4", "x + 12", "3x + 12", "7x"], 
-            answer: "C", 
-            topic: "Algebra" 
-        },
-        { 
-            id: "m6", 
-            text: "A rectangle has length 8 cm and width 5 cm. What is its area?", 
-            options: ["13 cm²", "26 cm²", "40 cm²", "80 cm²"], 
-            answer: "C", 
-            topic: "Geometry" 
-        }
+    2: [ // Medium
+        { id: "m1", text: "Find the distance between Point A (−2, 3) and Point B (4, 3).", svg: generateSVGGrid([{x: -2, y: 3, label: "A"}, {x: 4, y: 3, label: "B"}], [{x1: -2, y1: 3, x2: 4, y2: 3, color: "#93c5fd"}]), options: ["2 units", "4 units", "6 units", "8 units"], answer: "C", topic: "Coordinate Geometry" },
+        { id: "m2", text: "What is the gradient (slope) of the line passing through (0, 1) and (2, 5)?", options: ["1", "2", "3", "4"], answer: "B", topic: "Coordinate Geometry" },
+        { id: "m3", text: "Which equation represents a straight line passing through the origin with slope 3?", options: ["y = x + 3", "y = 3x", "y = 3", "x = 3y"], answer: "B", topic: "Coordinate Geometry" },
+        { id: "m4", text: "If point P(3, 4) is reflected across the x-axis, what are its new coordinates?", options: ["(−3, 4)", "(3, −4)", "(−3, −4)", "(4, 3)"], answer: "B", topic: "Coordinate Geometry" },
+        { id: "m5", text: "What is the slope of the horizontal line shown on the grid below?", svg: generateSVGGrid([], [{x1: -5, y1: 2, x2: 5, y2: 2}]), options: ["0", "1", "2", "Undefined"], answer: "A", topic: "Coordinate Geometry" },
+        { id: "m6", text: "What is the x-intercept of the line y = 2x − 4?", svg: generateSVGGrid([{x: 2, y: 0, label: "(2,0)"}], [{x1: -1, y1: -6, x2: 4, y2: 4}]), options: ["(−4, 0)", "(0, −4)", "(2, 0)", "(0, 2)"], answer: "C", topic: "Coordinate Geometry" },
+        { id: "m7", text: "What is the HCF of 18 and 24?", options: ["3", "6", "9", "12"], answer: "B", topic: "Number" },
+        { id: "m8", text: "Expand: 3(x + 4).", options: ["3x + 4", "x + 12", "3x + 12", "7x"], answer: "C", topic: "Algebra" },
+        { id: "m9", text: "A rectangle has length 8 cm and width 5 cm. What is its area?", options: ["13 cm²", "26 cm²", "40 cm²", "80 cm²"], answer: "C", topic: "Geometry" },
+        { id: "m10", text: "Solve: 2x − 5 = 9.", options: ["2", "5", "7", "14"], answer: "C", topic: "Algebra" }
     ],
-    3: [ // Hard Level
-        { 
-            id: "h1", 
-            text: "Identify the equation of the line shown on the grid below.", 
-            svg: generateSVGGrid([], [{x1: -3, y1: -4, x2: 3, y2: 2}]),
-            options: ["y = x + 1", "y = x − 1", "y = 2x + 1", "y = x + 2"], 
-            answer: "B", 
-            topic: "Coordinate Geometry" 
-        },
-        { 
-            id: "h2", 
-            text: "Find the midpoint of the line segment joining Point A (−4, 2) and Point B (2, 6).", 
-            options: ["(−1, 4)", "(1, 4)", "(−2, 8)", "(−3, 4)"], 
-            answer: "A", 
-            topic: "Coordinate Geometry" 
-        },
-        { 
-            id: "h3", 
-            text: "What is the y-intercept of the line 2x + 3y = 12?", 
-            options: ["(0, 6)", "(0, 4)", "(6, 0)", "(4, 0)"], 
-            answer: "B", 
-            topic: "Coordinate Geometry" 
-        },
-        { 
-            id: "h4", 
-            text: "Factorise: 6x + 12.", 
-            options: ["6(x + 2)", "6(x + 12)", "12(x + 6)", "2(3x + 12)"], 
-            answer: "A", 
-            topic: "Algebra" 
-        },
-        { 
-            id: "h5", 
-            text: "If y = 3x + 2, what is y when x = 4?", 
-            options: ["10", "12", "14", "16"], 
-            answer: "C", 
-            topic: "Algebra" 
-        },
-        { 
-            id: "h6", 
-            text: "One angle in a right-angled triangle is 35°. What is the other acute angle?", 
-            options: ["45°", "55°", "65°", "75°"], 
-            answer: "B", 
-            topic: "Geometry" 
-        }
+    3: [ // Hard
+        { id: "h1", text: "Identify the equation of the line shown on the grid below.", svg: generateSVGGrid([], [{x1: -3, y1: -4, x2: 3, y2: 2}]), options: ["y = x + 1", "y = x − 1", "y = 2x + 1", "y = x + 2"], answer: "B", topic: "Coordinate Geometry" },
+        { id: "h2", text: "Find the midpoint of the line segment joining Point A (−4, 2) and Point B (2, 6).", options: ["(−1, 4)", "(1, 4)", "(−2, 8)", "(−3, 4)"], answer: "A", topic: "Coordinate Geometry" },
+        { id: "h3", text: "What is the y-intercept of the line 2x + 3y = 12?", options: ["(0, 6)", "(0, 4)", "(6, 0)", "(4, 0)"], answer: "B", topic: "Coordinate Geometry" },
+        { id: "h4", text: "Which point lies on the line y = 3x − 2?", options: ["(1, 2)", "(2, 4)", "(3, 5)", "(0, 2)"], answer: "B", topic: "Coordinate Geometry" },
+        { id: "h5", text: "What is the slope of a line perpendicular to line with slope 2?", options: ["2", "−2", "1/2", "−1/2"], answer: "D", topic: "Coordinate Geometry" },
+        { id: "h6", text: "Calculate the distance between (1, 2) and (4, 6).", options: ["3 units", "4 units", "5 units", "7 units"], answer: "C", topic: "Coordinate Geometry" },
+        { id: "h7", text: "Factorise: 6x + 12.", options: ["6(x + 2)", "6(x + 12)", "12(x + 6)", "2(3x + 12)"], answer: "A", topic: "Algebra" },
+        { id: "h8", text: "If y = 3x + 2, what is y when x = 4?", options: ["10", "12", "14", "16"], answer: "C", topic: "Algebra" },
+        { id: "h9", text: "One angle in a right-angled triangle is 35°. What is the other acute angle?", options: ["45°", "55°", "65°", "75°"], answer: "B", topic: "Geometry" },
+        { id: "h10", text: "Solve for x: 3(x − 2) = 2x + 5.", options: ["1", "7", "11", "13"], answer: "C", topic: "Algebra" }
     ]
 };
 
-// Adaptive State
+// State Variables
 let studentName = "";
 let currentLevel = 2; // Start Medium
 let currentQuestionIndex = 0;
-let totalQuestionsToAsk = 10;
+let totalQuestionsToAsk = 20; // Set to 20 for 45-minute test
 let servedQuestions = [];
 let currentQuestion = null;
+let timerInterval = null;
+let secondsRemaining = 45 * 60; // 45 minutes
 
 let stats = {
     1: { attempted: 0, correct: 0 },
@@ -514,18 +449,42 @@ let stats = {
 function startTest() {
     studentName = document.getElementById("studentName").value.trim();
     if (!studentName) {
-        alert("Please enter your name to start.");
+        showAlert("Please enter your name to start.");
         return;
     }
 
     document.getElementById("startSection").classList.add("hidden");
     document.getElementById("quizSection").classList.remove("hidden");
 
+    startTimer();
     loadNextQuestion();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        secondsRemaining--;
+        updateTimerDisplay();
+
+        if (secondsRemaining <= 0) {
+            clearInterval(timerInterval);
+            showAlert("Time is up! Submitting your assessment.");
+            finishTest();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    let mins = Math.floor(secondsRemaining / 60);
+    let secs = secondsRemaining % 60;
+    let formattedMins = mins < 10 ? "0" + mins : mins;
+    let formattedSecs = secs < 10 ? "0" + secs : secs;
+    document.getElementById("timerDisplay").innerText = `⏱ ${formattedMins}:${formattedSecs}`;
 }
 
 function loadNextQuestion() {
     if (currentQuestionIndex >= totalQuestionsToAsk) {
+        clearInterval(timerInterval);
         finishTest();
         return;
     }
@@ -537,7 +496,7 @@ function loadNextQuestion() {
     document.getElementById("progressBar").style.width = progressPercent + "%";
     document.getElementById("questionCount").innerText = `Question ${currentQuestionIndex} of ${totalQuestionsToAsk}`;
     
-    // Fetch adaptive question
+    // Adaptive Pool Lookup
     let pool = questionBank[currentLevel].filter(q => !servedQuestions.includes(q.id));
     
     if (pool.length === 0) {
@@ -552,7 +511,7 @@ function loadNextQuestion() {
     document.getElementById("qNumber").innerText = `Question ${currentQuestionIndex}`;
     document.getElementById("qText").innerText = currentQuestion.text;
 
-    // Render SVG Diagram if present
+    // Render Diagram
     const diagContainer = document.getElementById("diagramContainer");
     if (currentQuestion.svg) {
         diagContainer.innerHTML = currentQuestion.svg;
@@ -562,7 +521,7 @@ function loadNextQuestion() {
         diagContainer.classList.add("hidden");
     }
 
-    // Difficulty Badges
+    // Badge Render
     const badge = document.getElementById("qBadge");
     const levelDisplay = document.getElementById("currentLevelDisplay");
     
@@ -580,7 +539,7 @@ function loadNextQuestion() {
         levelDisplay.innerText = "Current Level: Hard";
     }
 
-    // Render Options
+    // Options Render
     const optionsContainer = document.getElementById("optionsContainer");
     optionsContainer.innerHTML = "";
     
@@ -597,19 +556,18 @@ function loadNextQuestion() {
 function submitAnswer() {
     const selected = document.querySelector('input[name="opt"]:checked');
     if (!selected) {
-        alert("Please select an answer before continuing.");
+        showAlert("Please select an answer before continuing.");
         return;
     }
 
     const isCorrect = (selected.value === currentQuestion.answer);
     
-    // Track stats
     stats[currentLevel].attempted++;
     if (isCorrect) {
         stats[currentLevel].correct++;
     }
 
-    // Adaptive CAT Engine Steps
+    // CAT Adaptation Engine
     if (isCorrect) {
         if (currentLevel < 3) currentLevel++;
     } else {
@@ -620,13 +578,13 @@ function submitAnswer() {
 }
 
 function finishTest() {
+    clearInterval(timerInterval);
     document.getElementById("quizSection").classList.add("hidden");
     document.getElementById("result").style.display = "block";
 
     const totalAttempted = stats[1].attempted + stats[2].attempted + stats[3].attempted;
     const totalCorrect = stats[1].correct + stats[2].correct + stats[3].correct;
     
-    // Weighted scoring
     const weightedScore = (stats[1].correct * 1) + (stats[2].correct * 2) + (stats[3].correct * 3);
     const maxPossibleWeighted = (stats[1].attempted * 1) + (stats[2].attempted * 2) + (stats[3].attempted * 3);
     const performanceRatio = maxPossibleWeighted > 0 ? (weightedScore / maxPossibleWeighted) : 0;
@@ -642,7 +600,6 @@ function finishTest() {
         placement = "Foundation (Needs Support)";
     }
 
-    // Results UI Output
     document.getElementById("studentResult").innerHTML = `<strong>Student:</strong> ${studentName}`;
     document.getElementById("scoreResult").innerHTML = `${totalCorrect} / ${totalAttempted} Correct<br><span style="font-size:18px; color:#555;">Weighted Score: ${weightedScore} pts</span>`;
     document.getElementById("levelResult").innerText = `Placement Level: ${placement}`;
