@@ -86,7 +86,7 @@ h1 {
 .timer-badge {
     background: #1e293b;
     color: #f8fafc;
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
     font-family: monospace;
     font-size: 15px;
@@ -110,19 +110,8 @@ h1 {
 .question-number {
     font-weight: bold;
     color: #2563eb;
+    font-size: 16px;
 }
-
-.difficulty-badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.badge-easy { background: #dcfce7; color: #15803d; }
-.badge-medium { background: #fef3c7; color: #b45309; }
-.badge-hard { background: #fee2e2; color: #b91c1c; }
 
 .question-text {
     font-size: 18px;
@@ -259,7 +248,7 @@ Middle Year Assessment (MYA) — 45-Minute CAT
         <label for="studentName">Student Name</label>
         <input type="text" id="studentName" placeholder="Enter your full name">
     </div>
-    <button class="primary-btn" onclick="startTest()">Start 45-Minute Adaptive Test (20 Questions)</button>
+    <button class="primary-btn" onclick="startTest()">Start 45-Minute Assessment (20 Questions)</button>
 </div>
 
 <!-- Test Section -->
@@ -271,14 +260,12 @@ Middle Year Assessment (MYA) — 45-Minute CAT
     <div class="status-header">
         <span id="questionCount">Question 1 of 20</span>
         <span id="timerDisplay" class="timer-badge">⏱ 45:00</span>
-        <span id="currentLevelDisplay">Current Level: Medium</span>
     </div>
 
     <form id="adaptiveForm">
         <div class="question">
             <div class="question-meta">
                 <span class="question-number" id="qNumber">Question 1</span>
-                <span class="difficulty-badge" id="qBadge">Medium</span>
             </div>
             <div class="question-text" id="qText"></div>
 
@@ -335,7 +322,6 @@ Middle Year Assessment (MYA) — 45-Minute CAT
 </div>
 
 <script>
-// Notification Helper
 function showAlert(message) {
     const toast = document.getElementById("alertToast");
     toast.innerText = message;
@@ -345,7 +331,6 @@ function showAlert(message) {
     }, 3500);
 }
 
-// SVG Grid Generator
 function generateSVGGrid(points = [], lines = []) {
     let svg = `<svg width="260" height="260" viewBox="-130 -130 260 260" xmlns="http://www.w3.org/2000/svg">`;
     svg += `<rect x="-130" y="-130" width="260" height="260" fill="#f8fafc"/>`;
@@ -390,55 +375,85 @@ function generateSVGGrid(points = [], lines = []) {
     return svg;
 }
 
-// Extended Question Bank
+// 60-Question Pool (20 per level)
 const questionBank = {
     1: [ // Easy
-        { id: "e1", text: "What are the coordinates of point A plotted on the grid below?", svg: generateSVGGrid([{x: 3, y: 2, label: "A"}]), options: ["(3, 2)", "(2, 3)", "(−3, 2)", "(3, −2)"], answer: "A", topic: "Coordinate Geometry" },
-        { id: "e2", text: "In which quadrant does the point (−4, 3) lie?", options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"], answer: "B", topic: "Coordinate Geometry" },
-        { id: "e3", text: "What are the coordinates of the origin on a Cartesian grid?", svg: generateSVGGrid([{x: 0, y: 0, label: "O"}]), options: ["(1, 1)", "(0, 1)", "(0, 0)", "(1, 0)"], answer: "C", topic: "Coordinate Geometry" },
-        { id: "e4", text: "If a point lies on the x-axis, what must its y-coordinate be?", options: ["0", "1", "−1", "Any positive number"], answer: "A", topic: "Coordinate Geometry" },
-        { id: "e5", text: "What are the coordinates of point B shown on the grid below?", svg: generateSVGGrid([{x: -3, y: -2, label: "B"}]), options: ["(3, 2)", "(−3, 2)", "(−3, −2)", "(−2, −3)"], answer: "C", topic: "Coordinate Geometry" },
-        { id: "e6", text: "Which axis runs horizontally across the coordinate grid?", options: ["x-axis", "y-axis", "z-axis", "Origin axis"], answer: "A", topic: "Coordinate Geometry" },
-        { id: "e7", text: "What is −8 + 13?", options: ["−21", "−5", "5", "21"], answer: "C", topic: "Number" },
-        { id: "e8", text: "Simplify: 3x + 5x.", options: ["8", "8x", "15x", "2x"], answer: "B", topic: "Algebra" },
-        { id: "e9", text: "Solve: x + 7 = 15.", options: ["7", "8", "9", "22"], answer: "B", topic: "Algebra" },
-        { id: "e10", text: "What is 25% of 80?", options: ["15", "20", "25", "30"], answer: "B", topic: "Ratio" }
+        { id: "e1", text: "What are the coordinates of point A plotted on the grid below?", svg: generateSVGGrid([{x: 3, y: 2, label: "A"}]), options: ["(3, 2)", "(2, 3)", "(−3, 2)", "(3, −2)"], answer: "A" },
+        { id: "e2", text: "In which quadrant does the point (−4, 3) lie?", options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"], answer: "B" },
+        { id: "e3", text: "What are the coordinates of the origin on a Cartesian grid?", svg: generateSVGGrid([{x: 0, y: 0, label: "O"}]), options: ["(1, 1)", "(0, 1)", "(0, 0)", "(1, 0)"], answer: "C" },
+        { id: "e4", text: "If a point lies on the x-axis, what must its y-coordinate be?", options: ["0", "1", "−1", "Any positive number"], answer: "A" },
+        { id: "e5", text: "What are the coordinates of point B shown on the grid below?", svg: generateSVGGrid([{x: -3, y: -2, label: "B"}]), options: ["(3, 2)", "(−3, 2)", "(−3, −2)", "(−2, −3)"], answer: "C" },
+        { id: "e6", text: "Which axis runs horizontally across the coordinate grid?", options: ["x-axis", "y-axis", "z-axis", "Origin axis"], answer: "A" },
+        { id: "e7", text: "In the point (-4, 7), which coordinate represents the y-axis position?", options: ["-4", "7", "3", "-7"], answer: "B" },
+        { id: "e8", text: "Which point lies in Quadrant IV?", options: ["(2, -3)", "(-2, 3)", "(-2, -3)", "(2, 3)"], answer: "A" },
+        { id: "e9", text: "If a point lies on the y-axis, what is its x-coordinate?", options: ["1", "-1", "0", "Any positive number"], answer: "C" },
+        { id: "e10", text: "In the ordered pair (x, y), which coordinate comes first?", options: ["y-coordinate", "x-coordinate", "Origin", "Slope"], answer: "B" },
+        { id: "e11", text: "What is −8 + 13?", options: ["−21", "−5", "5", "21"], answer: "C" },
+        { id: "e12", text: "Simplify: 3x + 5x.", options: ["8", "8x", "15x", "2x"], answer: "B" },
+        { id: "e13", text: "Solve: x + 7 = 15.", options: ["7", "8", "9", "22"], answer: "B" },
+        { id: "e14", text: "What is 25% of 80?", options: ["15", "20", "25", "30"], answer: "B" },
+        { id: "e15", text: "Evaluate 3x when x = 4.", options: ["7", "12", "1", "14"], answer: "B" },
+        { id: "e16", text: "Solve for y: 2y = 18.", options: ["7", "8", "9", "36"], answer: "C" },
+        { id: "e17", text: "What is the distance between (0, 0) and (0, 7)?", options: ["0", "7", "14", "49"], answer: "B" },
+        { id: "e18", text: "What is the value of 5 squared?", options: ["10", "15", "25", "20"], answer: "C" },
+        { id: "e19", text: "Which quadrant has negative x and positive y values?", options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"], answer: "B" },
+        { id: "e20", text: "Solve for a: a - 9 = 3.", options: ["6", "-6", "12", "27"], answer: "C" }
     ],
     2: [ // Medium
-        { id: "m1", text: "Find the distance between Point A (−2, 3) and Point B (4, 3).", svg: generateSVGGrid([{x: -2, y: 3, label: "A"}, {x: 4, y: 3, label: "B"}], [{x1: -2, y1: 3, x2: 4, y2: 3, color: "#93c5fd"}]), options: ["2 units", "4 units", "6 units", "8 units"], answer: "C", topic: "Coordinate Geometry" },
-        { id: "m2", text: "What is the gradient (slope) of the line passing through (0, 1) and (2, 5)?", options: ["1", "2", "3", "4"], answer: "B", topic: "Coordinate Geometry" },
-        { id: "m3", text: "Which equation represents a straight line passing through the origin with slope 3?", options: ["y = x + 3", "y = 3x", "y = 3", "x = 3y"], answer: "B", topic: "Coordinate Geometry" },
-        { id: "m4", text: "If point P(3, 4) is reflected across the x-axis, what are its new coordinates?", options: ["(−3, 4)", "(3, −4)", "(−3, −4)", "(4, 3)"], answer: "B", topic: "Coordinate Geometry" },
-        { id: "m5", text: "What is the slope of the horizontal line shown on the grid below?", svg: generateSVGGrid([], [{x1: -5, y1: 2, x2: 5, y2: 2}]), options: ["0", "1", "2", "Undefined"], answer: "A", topic: "Coordinate Geometry" },
-        { id: "m6", text: "What is the x-intercept of the line y = 2x − 4?", svg: generateSVGGrid([{x: 2, y: 0, label: "(2,0)"}], [{x1: -1, y1: -6, x2: 4, y2: 4}]), options: ["(−4, 0)", "(0, −4)", "(2, 0)", "(0, 2)"], answer: "C", topic: "Coordinate Geometry" },
-        { id: "m7", text: "What is the HCF of 18 and 24?", options: ["3", "6", "9", "12"], answer: "B", topic: "Number" },
-        { id: "m8", text: "Expand: 3(x + 4).", options: ["3x + 4", "x + 12", "3x + 12", "7x"], answer: "C", topic: "Algebra" },
-        { id: "m9", text: "A rectangle has length 8 cm and width 5 cm. What is its area?", options: ["13 cm²", "26 cm²", "40 cm²", "80 cm²"], answer: "C", topic: "Geometry" },
-        { id: "m10", text: "Solve: 2x − 5 = 9.", options: ["2", "5", "7", "14"], answer: "C", topic: "Algebra" }
+        { id: "m1", text: "Find the distance between Point A (−2, 3) and Point B (4, 3).", svg: generateSVGGrid([{x: -2, y: 3, label: "A"}, {x: 4, y: 3, label: "B"}], [{x1: -2, y1: 3, x2: 4, y2: 3, color: "#93c5fd"}]), options: ["2 units", "4 units", "6 units", "8 units"], answer: "C" },
+        { id: "m2", text: "What is the gradient (slope) of the line passing through (0, 1) and (2, 5)?", options: ["1", "2", "3", "4"], answer: "B" },
+        { id: "m3", text: "Which equation represents a straight line passing through the origin with slope 3?", options: ["y = x + 3", "y = 3x", "y = 3", "x = 3y"], answer: "B" },
+        { id: "m4", text: "If point P(3, 4) is reflected across the x-axis, what are its new coordinates?", options: ["(−3, 4)", "(3, −4)", "(−3, −4)", "(4, 3)"], answer: "B" },
+        { id: "m5", text: "What is the slope of the horizontal line shown on the grid below?", svg: generateSVGGrid([], [{x1: -5, y1: 2, x2: 5, y2: 2}]), options: ["0", "1", "2", "Undefined"], answer: "A" },
+        { id: "m6", text: "What is the x-intercept of the line y = 2x − 4?", svg: generateSVGGrid([{x: 2, y: 0, label: "(2,0)"}], [{x1: -1, y1: -6, x2: 4, y2: 4}]), options: ["(−4, 0)", "(0, −4)", "(2, 0)", "(0, 2)"], answer: "C" },
+        { id: "m7", text: "What is the y-intercept of the line y = -4x + 9?", options: ["-4", "9", "-9", "4"], answer: "B" },
+        { id: "m8", text: "Reflect the point (-5, 3) over the y-axis.", options: ["(5, 3)", "(-5, -3)", "(5, -3)", "(3, -5)"], answer: "A" },
+        { id: "m9", text: "What is the slope of a vertical line?", options: ["0", "1", "Undefined", "Infinity"], answer: "C" },
+        { id: "m10", text: "Translate the point (2, 5) up 3 units and left 4 units.", options: ["(6, 8)", "(-2, 8)", "(5, 2)", "(-2, 2)"], answer: "B" },
+        { id: "m11", text: "What is the HCF of 18 and 24?", options: ["3", "6", "9", "12"], answer: "B" },
+        { id: "m12", text: "Expand: 3(x + 4).", options: ["3x + 4", "x + 12", "3x + 12", "7x"], answer: "C" },
+        { id: "m13", text: "A rectangle has length 8 cm and width 5 cm. What is its area?", options: ["13 cm²", "26 cm²", "40 cm²", "80 cm²"], answer: "C" },
+        { id: "m14", text: "Solve: 2x − 5 = 9.", options: ["2", "5", "7", "14"], answer: "C" },
+        { id: "m15", text: "Solve for x: 3x - 5 = 16.", options: ["5", "6", "7", "8"], answer: "C" },
+        { id: "m16", text: "If y = 3x + 2, what is y when x = -2?", options: ["-8", "-4", "4", "8"], answer: "B" },
+        { id: "m17", text: "Solve for m: 4m + 8 = 2m + 16.", options: ["2", "4", "6", "8"], answer: "B" },
+        { id: "m18", text: "Solve for x: 2(x - 3) = 10.", options: ["5", "8", "11", "13"], answer: "B" },
+        { id: "m19", text: "Which point lies on the line y = 2x + 1?", options: ["(1, 2)", "(2, 5)", "(3, 6)", "(0, 0)"], answer: "B" },
+        { id: "m20", text: "Reflect the point (-2, -6) over the x-axis.", options: ["(2, -6)", "(-2, 6)", "(2, 6)", "(-6, -2)"], answer: "B" }
     ],
     3: [ // Hard
-        { id: "h1", text: "Identify the equation of the line shown on the grid below.", svg: generateSVGGrid([], [{x1: -3, y1: -4, x2: 3, y2: 2}]), options: ["y = x + 1", "y = x − 1", "y = 2x + 1", "y = x + 2"], answer: "B", topic: "Coordinate Geometry" },
-        { id: "h2", text: "Find the midpoint of the line segment joining Point A (−4, 2) and Point B (2, 6).", options: ["(−1, 4)", "(1, 4)", "(−2, 8)", "(−3, 4)"], answer: "A", topic: "Coordinate Geometry" },
-        { id: "h3", text: "What is the y-intercept of the line 2x + 3y = 12?", options: ["(0, 6)", "(0, 4)", "(6, 0)", "(4, 0)"], answer: "B", topic: "Coordinate Geometry" },
-        { id: "h4", text: "Which point lies on the line y = 3x − 2?", options: ["(1, 2)", "(2, 4)", "(3, 5)", "(0, 2)"], answer: "B", topic: "Coordinate Geometry" },
-        { id: "h5", text: "What is the slope of a line perpendicular to line with slope 2?", options: ["2", "−2", "1/2", "−1/2"], answer: "D", topic: "Coordinate Geometry" },
-        { id: "h6", text: "Calculate the distance between (1, 2) and (4, 6).", options: ["3 units", "4 units", "5 units", "7 units"], answer: "C", topic: "Coordinate Geometry" },
-        { id: "h7", text: "Factorise: 6x + 12.", options: ["6(x + 2)", "6(x + 12)", "12(x + 6)", "2(3x + 12)"], answer: "A", topic: "Algebra" },
-        { id: "h8", text: "If y = 3x + 2, what is y when x = 4?", options: ["10", "12", "14", "16"], answer: "C", topic: "Algebra" },
-        { id: "h9", text: "One angle in a right-angled triangle is 35°. What is the other acute angle?", options: ["45°", "55°", "65°", "75°"], answer: "B", topic: "Geometry" },
-        { id: "h10", text: "Solve for x: 3(x − 2) = 2x + 5.", options: ["1", "7", "11", "13"], answer: "C", topic: "Algebra" }
+        { id: "h1", text: "Identify the equation of the line shown on the grid below.", svg: generateSVGGrid([], [{x1: -3, y1: -4, x2: 3, y2: 2}]), options: ["y = x + 1", "y = x − 1", "y = 2x + 1", "y = x + 2"], answer: "B" },
+        { id: "h2", text: "Find the midpoint of the line segment joining Point A (−4, 2) and Point B (2, 6).", options: ["(−1, 4)", "(1, 4)", "(−2, 8)", "(−3, 4)"], answer: "A" },
+        { id: "h3", text: "What is the y-intercept of the line 2x + 3y = 12?", options: ["(0, 6)", "(0, 4)", "(6, 0)", "(4, 0)"], answer: "B" },
+        { id: "h4", text: "Which point lies on the line y = 3x − 2?", options: ["(1, 2)", "(2, 4)", "(3, 5)", "(0, 2)"], answer: "B" },
+        { id: "h5", text: "What is the slope of a line perpendicular to a line with slope 2?", options: ["2", "−2", "1/2", "−1/2"], answer: "D" },
+        { id: "h6", text: "Calculate the distance between (1, 2) and (4, 6).", options: ["3 units", "4 units", "5 units", "7 units"], answer: "C" },
+        { id: "h7", text: "What is the equation of a line with slope -2 passing through (3, 1)?", options: ["y = -2x + 7", "y = -2x + 5", "y = 2x - 7", "y = -2x + 1"], answer: "A" },
+        { id: "h8", text: "What is the slope of a line parallel to 2x + 4y = 8?", options: ["2", "-2", "-1/2", "1/2"], answer: "C" },
+        { id: "h9", text: "Find the equation of a line passing through (2, 5) and (4, 11).", options: ["y = 3x - 1", "y = 3x + 1", "y = 2x + 1", "y = 3x - 5"], answer: "A" },
+        { id: "h10", text: "Convert 3x - 2y = 6 into slope-intercept form (y = mx + c).", options: ["y = (3/2)x - 3", "y = (3/2)x + 3", "y = -(3/2)x - 3", "y = 3x - 6"], answer: "A" },
+        { id: "h11", text: "If a line passes through (1, k) and (4, 8) with a slope of 2, what is k?", options: ["1", "2", "4", "6"], answer: "B" },
+        { id: "h12", text: "Find the y-intercept of a line perpendicular to y = 2x + 3 passing through (4, 1).", options: ["1", "3", "5", "-1"], answer: "B" },
+        { id: "h13", text: "Which equation represents a line parallel to y = -5x + 2 passing through (0, -4)?", options: ["y = -5x - 4", "y = 5x - 4", "y = (1/5)x - 4", "y = -5x + 4"], answer: "A" },
+        { id: "h14", text: "Factorise: 6x + 12.", options: ["6(x + 2)", "6(x + 12)", "12(x + 6)", "2(3x + 12)"], answer: "A" },
+        { id: "h15", text: "If y = 3x + 2, what is y when x = 4?", options: ["10", "12", "14", "16"], answer: "C" },
+        { id: "h16", text: "One angle in a right-angled triangle is 35°. What is the other acute angle?", options: ["45°", "55°", "65°", "75°"], answer: "B" },
+        { id: "h17", text: "Solve for x: 3(x − 2) = 2x + 5.", options: ["1", "7", "11", "13"], answer: "C" },
+        { id: "h18", text: "Solve for x: 2(3x - 4) = 4x + 6.", options: ["5", "7", "8", "10"], answer: "B" },
+        { id: "h19", text: "Solve for x: 5x - 3(x + 2) = 14.", options: ["8", "10", "12", "14"], answer: "B" },
+        { id: "h20", text: "Solve the system of equations for x: x + y = 10 and x - y = 4.", options: ["5", "6", "7", "8"], answer: "C" }
     ]
 };
 
-// State Variables
+// Adaptive State
 let studentName = "";
 let currentLevel = 2; // Start Medium
 let currentQuestionIndex = 0;
-let totalQuestionsToAsk = 20; // Set to 20 for 45-minute test
+let totalQuestionsToAsk = 20;
 let servedQuestions = [];
 let currentQuestion = null;
 let timerInterval = null;
-let secondsRemaining = 45 * 60; // 45 minutes
+let secondsRemaining = 45 * 60;
 
 let stats = {
     1: { attempted: 0, correct: 0 },
@@ -491,12 +506,10 @@ function loadNextQuestion() {
 
     currentQuestionIndex++;
     
-    // Progress Bar Update
     const progressPercent = ((currentQuestionIndex - 1) / totalQuestionsToAsk) * 100;
     document.getElementById("progressBar").style.width = progressPercent + "%";
     document.getElementById("questionCount").innerText = `Question ${currentQuestionIndex} of ${totalQuestionsToAsk}`;
     
-    // Adaptive Pool Lookup
     let pool = questionBank[currentLevel].filter(q => !servedQuestions.includes(q.id));
     
     if (pool.length === 0) {
@@ -507,11 +520,9 @@ function loadNextQuestion() {
     currentQuestion = pool[Math.floor(Math.random() * pool.length)];
     servedQuestions.push(currentQuestion.id);
 
-    // Render Question Details
     document.getElementById("qNumber").innerText = `Question ${currentQuestionIndex}`;
     document.getElementById("qText").innerText = currentQuestion.text;
 
-    // Render Diagram
     const diagContainer = document.getElementById("diagramContainer");
     if (currentQuestion.svg) {
         diagContainer.innerHTML = currentQuestion.svg;
@@ -521,25 +532,6 @@ function loadNextQuestion() {
         diagContainer.classList.add("hidden");
     }
 
-    // Badge Render
-    const badge = document.getElementById("qBadge");
-    const levelDisplay = document.getElementById("currentLevelDisplay");
-    
-    if (currentLevel === 1) {
-        badge.innerText = "Easy";
-        badge.className = "difficulty-badge badge-easy";
-        levelDisplay.innerText = "Current Level: Easy";
-    } else if (currentLevel === 2) {
-        badge.innerText = "Medium";
-        badge.className = "difficulty-badge badge-medium";
-        levelDisplay.innerText = "Current Level: Medium";
-    } else {
-        badge.innerText = "Hard";
-        badge.className = "difficulty-badge badge-hard";
-        levelDisplay.innerText = "Current Level: Hard";
-    }
-
-    // Options Render
     const optionsContainer = document.getElementById("optionsContainer");
     optionsContainer.innerHTML = "";
     
@@ -567,7 +559,6 @@ function submitAnswer() {
         stats[currentLevel].correct++;
     }
 
-    // CAT Adaptation Engine
     if (isCorrect) {
         if (currentLevel < 3) currentLevel++;
     } else {
