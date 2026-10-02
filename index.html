@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathematics Diagnostic Assessment (MYA)</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef3f8;
+    color: #222;
+}
+
+.container {
+    max-width: 850px;
+    margin: 30px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.10);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 5px;
+    color: #1e3a8a;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.name-box {
+    margin-bottom: 25px;
+}
+
+.name-box label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.name-box input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e6ed;
+    border-radius: 10px;
+    height: 12px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #2563eb;
+    transition: width 0.3s ease;
+}
+
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.question {
+    background: #f7f9fc;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border-left: 6px solid #2563eb;
+}
+
+.question-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.question-number {
+    font-weight: bold;
+    color: #2563eb;
+}
+
+.difficulty-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.badge-easy { background: #dcfce7; color: #15803d; }
+.badge-medium { background: #fef3c7; color: #b45309; }
+.badge-hard { background: #fee2e2; color: #b91c1c; }
+
+.question-text {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.svg-container {
+    text-align: center;
+    margin: 15px 0;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.option {
+    display: block;
+    padding: 12px;
+    margin: 8px 0;
+    background: white;
+    border: 1px solid #d5dbe3;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.option:hover {
+    background: #edf3ff;
+}
+
+.option input {
+    margin-right: 10px;
+}
+
+button {
+    border: none;
+    padding: 13px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
+    font-weight: bold;
+}
+
+.primary-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+}
+
+#result {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+    padding: 30px;
+    background: #f0f7ff;
+    border-radius: 15px;
+}
+
+.score {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 15px;
+    color: #1e3a8a;
+}
+
+.level {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 15px;
+    color: #2563eb;
+}
+
+.analysis {
+    margin-top: 25px;
+}
+
+.analysis table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+}
+
+.analysis th,
+.analysis td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.analysis th {
+    background: #f0f2f5;
+}
+
+.hidden {
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Mathematics Assessment</h1>
+
+<div class="subtitle">
+Middle Year Assessment (MYA) — Computerized Adaptive Test
+</div>
+
+<!-- Start Section -->
+<div id="startSection">
+    <div class="name-box">
+        <label for="studentName">Student Name</label>
+        <input type="text" id="studentName" placeholder="Enter your full name">
+    </div>
+    <button class="primary-btn" onclick="startTest()">Start Adaptive Test</button>
+</div>
+
+<!-- Test Section -->
+<div id="quizSection" class="hidden">
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="status-header">
+        <span id="questionCount">Question 1 of 10</span>
+        <span id="currentLevelDisplay">Current Level: Medium</span>
+    </div>
+
+    <form id="adaptiveForm">
+        <div class="question">
+            <div class="question-meta">
+                <span class="question-number" id="qNumber">Question 1</span>
+                <span class="difficulty-badge" id="qBadge">Medium</span>
+            </div>
+            <div class="question-text" id="qText"></div>
+
+            <div id="diagramContainer" class="svg-container hidden"></div>
+
+            <div id="optionsContainer"></div>
+        </div>
+
+        <button class="primary-btn" type="button" onclick="submitAnswer()">Next Question</button>
+    </form>
+</div>
+
+<!-- Result Section -->
+<div id="result">
+    <h2>Middle Year Assessment Result</h2>
+
+    <div id="studentResult"></div>
+
+    <div class="score" id="scoreResult"></div>
+
+    <div class="level" id="levelResult"></div>
+
+    <div class="analysis">
+        <h3>Adaptive Performance Summary</h3>
+        <table>
+            <tr>
+                <th>Difficulty Level</th>
+                <th>Attempted</th>
+                <th>Correct</th>
+                <th>Accuracy</th>
+            </tr>
+            <tr>
+                <td>Easy</td>
+                <td id="easyAttempted">0</td>
+                <td id="easyCorrect">0</td>
+                <td id="easyAcc">0%</td>
+            </tr>
+            <tr>
+                <td>Medium</td>
+                <td id="medAttempted">0</td>
+                <td id="medCorrect">0</td>
+                <td id="medAcc">0%</td>
+            </tr>
+            <tr>
+                <td>Hard</td>
+                <td id="hardAttempted">0</td>
+                <td id="hardCorrect">0</td>
+                <td id="hardAcc">0%</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+</div>
+
+<script>
+// Helper SVG Grid Generator
+function generateSVGGrid(points = [], lines = []) {
+    let svg = `<svg width="260" height="260" viewBox="-130 -130 260 260" xmlns="http://www.w3.org/2000/svg">`;
+    svg += `<rect x="-130" y="-130" width="260" height="260" fill="#f8fafc"/>`;
+    
+    // Gridlines
+    for (let i = -5; i <= 5; i++) {
+        let pos = i * 20;
+        let strokeColor = (i === 0) ? "#334155" : "#e2e8f0";
+        let strokeWidth = (i === 0) ? "2" : "1";
+        
+        svg += `<line x1="${pos}" y1="-120" x2="${pos}" y2="120" stroke="${strokeColor}" stroke-width="${strokeWidth}" />`;
+        svg += `<line x1="-120" y1="${pos}" x2="120" y2="${pos}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />`;
+        
+        if (i !== 0 && i >= -5 && i <= 5) {
+            svg += `<text x="${pos}" y="12" font-size="9" fill="#64748b" text-anchor="middle">${i}</text>`;
+            svg += `<text x="-10" y="${-pos + 3}" font-size="9" fill="#64748b" text-anchor="end">${i}</text>`;
+        }
+    }
+    
+    // Axes Arrows
+    svg += `<path d="M 0 -125 L -4 -115 L 4 -115 Z" fill="#334155"/>`;
+    svg += `<path d="M 125 0 L 115 -4 L 115 4 Z" fill="#334155"/>`;
+    svg += `<text x="115" y="-8" font-size="11" font-weight="bold" fill="#334155">x</text>`;
+    svg += `<text x="8" y="-115" font-size="11" font-weight="bold" fill="#334155">y</text>`;
+
+    // Lines
+    lines.forEach(l => {
+        let x1 = l.x1 * 20;
+        let y1 = -l.y1 * 20;
+        let x2 = l.x2 * 20;
+        let y2 = -l.y2 * 20;
+        svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${l.color || '#2563eb'}" stroke-width="2.5" />`;
+    });
+
+    // Points
+    points.forEach(p => {
+        let cx = p.x * 20;
+        let cy = -p.y * 20;
+        svg += `<circle cx="${cx}" cy="${cy}" r="5" fill="${p.color || '#dc2626'}" />`;
+        if (p.label) {
+            svg += `<text x="${cx + 7}" y="${cy - 7}" font-size="12" font-weight="bold" fill="#0f172a">${p.label}</text>`;
+        }
+    });
+
+    svg += `</svg>`;
+    return svg;
+}
+
+// Adaptive Question Bank
+const questionBank = {
+    1: [ // Easy Level
+        { 
+            id: "e1", 
+            text: "What are the coordinates of point A plotted on the grid below?", 
+            svg: generateSVGGrid([{x: 3, y: 2, label: "A"}]),
+            options: ["(3, 2)", "(2, 3)", "(−3, 2)", "(3, −2)"], 
+            answer: "A", 
+            topic: "Coordinate Geometry" 
+        },
+        { 
+            id: "e2", 
+            text: "In which quadrant does the point (−4, 3) lie?", 
+            options: ["Quadrant I", "Quadrant II", "Quadrant III", "Quadrant IV"], 
+            answer: "B", 
+            topic: "Coordinate Geometry" 
+        },
+        { 
+            id: "e3", 
+            text: "What is −8 + 13?", 
+            options: ["−21", "−5", "5", "21"], 
+            answer: "C", 
+            topic: "Number" 
+        },
+        { 
+            id: "e4", 
+            text: "Simplify: 3x + 5x.", 
+            options: ["8", "8x", "15x", "2x"], 
+            answer: "B", 
+            topic: "Algebra" 
+        },
+        { 
+            id: "e5", 
+            text: "Solve: x + 7 = 15.", 
+            options: ["7", "8", "9", "22"], 
+            answer: "B", 
+            topic: "Algebra" 
+        },
+        { 
+            id: "e6", 
+            text: "What is 25% of 80?", 
+            options: ["15", "20", "25", "30"], 
+            answer: "B", 
+            topic: "Ratio" 
+        }
+    ],
+    2: [ // Medium Level
+        { 
+            id: "m1", 
+            text: "Find the distance between Point A (−2, 3) and Point B (4, 3).", 
+            svg: generateSVGGrid([{x: -2, y: 3, label: "A"}, {x: 4, y: 3, label: "B"}], [{x1: -2, y1: 3, x2: 4, y2: 3, color: "#93c5fd"}]),
+            options: ["2 units", "4 units", "6 units", "8 units"], 
+            answer: "C", 
+            topic: "Coordinate Geometry" 
+        },
+        { 
+            id: "m2", 
+            text: "What is the gradient (slope) of the line passing through (0, 1) and (2, 5)?", 
+            options: ["1", "2", "3", "4"], 
+            answer: "B", 
+            topic: "Coordinate Geometry" 
+        },
+        { 
+            id: "m3", 
+            text: "Which equation represents a straight line passing through the origin with slope 3?", 
+            options: ["y = x + 3", "y = 3x", "y = 3", "x = 3y"], 
+            answer: "B", 
+            topic: "Coordinate Geometry" 
+        },
+        { 
+            id: "m4", 
+            text: "What is the HCF of 18 and 24?", 
+            options: ["3", "6", "9", "12"], 
+            answer: "B", 
+            topic: "Number" 
+        },
+        { 
+            id: "m5", 
+            text: "Expand: 3(x + 4).", 
+            options: ["3x + 4", "x + 12", "3x + 12", "7x"], 
+            answer: "C", 
+            topic: "Algebra" 
+        },
+        { 
+            id: "m6", 
+            text: "A rectangle has length 8 cm and width 5 cm. What is its area?", 
+            options: ["13 cm²", "26 cm²", "40 cm²", "80 cm²"], 
+            answer: "C", 
+            topic: "Geometry" 
+        }
+    ],
+    3: [ // Hard Level
+        { 
+            id: "h1", 
+            text: "Identify the equation of the line shown on the grid below.", 
+            svg: generateSVGGrid([], [{x1: -3, y1: -4, x2: 3, y2: 2}]),
+            options: ["y = x + 1", "y = x − 1", "y = 2x + 1", "y = x + 2"], 
+            answer: "B", 
+            topic: "Coordinate Geometry" 
+        },
+        { 
+            id: "h2", 
+            text: "Find the midpoint of the line segment joining Point A (−4, 2) and Point B (2, 6).", 
+            options: ["(−1, 4)", "(1, 4)", "(−2, 8)", "(−3, 4)"], 
+            answer: "A", 
+            topic: "Coordinate Geometry" 
+        },
+        { 
+            id: "h3", 
+            text: "What is the y-intercept of the line 2x + 3y = 12?", 
+            options: ["(0, 6)", "(0, 4)", "(6, 0)", "(4, 0)"], 
+            answer: "B", 
+            topic: "Coordinate Geometry" 
+        },
+        { 
+            id: "h4", 
+            text: "Factorise: 6x + 12.", 
+            options: ["6(x + 2)", "6(x + 12)", "12(x + 6)", "2(3x + 12)"], 
+            answer: "A", 
+            topic: "Algebra" 
+        },
+        { 
+            id: "h5", 
+            text: "If y = 3x + 2, what is y when x = 4?", 
+            options: ["10", "12", "14", "16"], 
+            answer: "C", 
+            topic: "Algebra" 
+        },
+        { 
+            id: "h6", 
+            text: "One angle in a right-angled triangle is 35°. What is the other acute angle?", 
+            options: ["45°", "55°", "65°", "75°"], 
+            answer: "B", 
+            topic: "Geometry" 
+        }
+    ]
+};
+
+// Adaptive State
+let studentName = "";
+let currentLevel = 2; // Start Medium
+let currentQuestionIndex = 0;
+let totalQuestionsToAsk = 10;
+let servedQuestions = [];
+let currentQuestion = null;
+
+let stats = {
+    1: { attempted: 0, correct: 0 },
+    2: { attempted: 0, correct: 0 },
+    3: { attempted: 0, correct: 0 }
+};
+
+function startTest() {
+    studentName = document.getElementById("studentName").value.trim();
+    if (!studentName) {
+        alert("Please enter your name to start.");
+        return;
+    }
+
+    document.getElementById("startSection").classList.add("hidden");
+    document.getElementById("quizSection").classList.remove("hidden");
+
+    loadNextQuestion();
+}
+
+function loadNextQuestion() {
+    if (currentQuestionIndex >= totalQuestionsToAsk) {
+        finishTest();
+        return;
+    }
+
+    currentQuestionIndex++;
+    
+    // Progress Bar Update
+    const progressPercent = ((currentQuestionIndex - 1) / totalQuestionsToAsk) * 100;
+    document.getElementById("progressBar").style.width = progressPercent + "%";
+    document.getElementById("questionCount").innerText = `Question ${currentQuestionIndex} of ${totalQuestionsToAsk}`;
+    
+    // Fetch adaptive question
+    let pool = questionBank[currentLevel].filter(q => !servedQuestions.includes(q.id));
+    
+    if (pool.length === 0) {
+        let altLevel = currentLevel === 3 ? 2 : (currentLevel === 1 ? 2 : 1);
+        pool = questionBank[altLevel].filter(q => !servedQuestions.includes(q.id));
+    }
+
+    currentQuestion = pool[Math.floor(Math.random() * pool.length)];
+    servedQuestions.push(currentQuestion.id);
+
+    // Render Question Details
+    document.getElementById("qNumber").innerText = `Question ${currentQuestionIndex}`;
+    document.getElementById("qText").innerText = currentQuestion.text;
+
+    // Render SVG Diagram if present
+    const diagContainer = document.getElementById("diagramContainer");
+    if (currentQuestion.svg) {
+        diagContainer.innerHTML = currentQuestion.svg;
+        diagContainer.classList.remove("hidden");
+    } else {
+        diagContainer.innerHTML = "";
+        diagContainer.classList.add("hidden");
+    }
+
+    // Difficulty Badges
+    const badge = document.getElementById("qBadge");
+    const levelDisplay = document.getElementById("currentLevelDisplay");
+    
+    if (currentLevel === 1) {
+        badge.innerText = "Easy";
+        badge.className = "difficulty-badge badge-easy";
+        levelDisplay.innerText = "Current Level: Easy";
+    } else if (currentLevel === 2) {
+        badge.innerText = "Medium";
+        badge.className = "difficulty-badge badge-medium";
+        levelDisplay.innerText = "Current Level: Medium";
+    } else {
+        badge.innerText = "Hard";
+        badge.className = "difficulty-badge badge-hard";
+        levelDisplay.innerText = "Current Level: Hard";
+    }
+
+    // Render Options
+    const optionsContainer = document.getElementById("optionsContainer");
+    optionsContainer.innerHTML = "";
+    
+    const optionLabels = ["A", "B", "C", "D"];
+    currentQuestion.options.forEach((optText, idx) => {
+        const letter = optionLabels[idx];
+        const label = document.createElement("label");
+        label.className = "option";
+        label.innerHTML = `<input type="radio" name="opt" value="${letter}"> ${letter}. ${optText}`;
+        optionsContainer.appendChild(label);
+    });
+}
+
+function submitAnswer() {
+    const selected = document.querySelector('input[name="opt"]:checked');
+    if (!selected) {
+        alert("Please select an answer before continuing.");
+        return;
+    }
+
+    const isCorrect = (selected.value === currentQuestion.answer);
+    
+    // Track stats
+    stats[currentLevel].attempted++;
+    if (isCorrect) {
+        stats[currentLevel].correct++;
+    }
+
+    // Adaptive CAT Engine Steps
+    if (isCorrect) {
+        if (currentLevel < 3) currentLevel++;
+    } else {
+        if (currentLevel > 1) currentLevel--;
+    }
+
+    loadNextQuestion();
+}
+
+function finishTest() {
+    document.getElementById("quizSection").classList.add("hidden");
+    document.getElementById("result").style.display = "block";
+
+    const totalAttempted = stats[1].attempted + stats[2].attempted + stats[3].attempted;
+    const totalCorrect = stats[1].correct + stats[2].correct + stats[3].correct;
+    
+    // Weighted scoring
+    const weightedScore = (stats[1].correct * 1) + (stats[2].correct * 2) + (stats[3].correct * 3);
+    const maxPossibleWeighted = (stats[1].attempted * 1) + (stats[2].attempted * 2) + (stats[3].attempted * 3);
+    const performanceRatio = maxPossibleWeighted > 0 ? (weightedScore / maxPossibleWeighted) : 0;
+
+    let placement = "";
+    if (currentLevel === 3 && performanceRatio >= 0.7) {
+        placement = "Extension (Above Grade Level)";
+    } else if (currentLevel >= 2 && performanceRatio >= 0.6) {
+        placement = "Secure (On Grade Level)";
+    } else if (currentLevel === 2) {
+        placement = "Developing (Approaching Grade Level)";
+    } else {
+        placement = "Foundation (Needs Support)";
+    }
+
+    // Results UI Output
+    document.getElementById("studentResult").innerHTML = `<strong>Student:</strong> ${studentName}`;
+    document.getElementById("scoreResult").innerHTML = `${totalCorrect} / ${totalAttempted} Correct<br><span style="font-size:18px; color:#555;">Weighted Score: ${weightedScore} pts</span>`;
+    document.getElementById("levelResult").innerText = `Placement Level: ${placement}`;
+
+    renderRow("easy", 1);
+    renderRow("med", 2);
+    renderRow("hard", 3);
+}
+
+function renderRow(prefix, level) {
+    const att = stats[level].attempted;
+    const corr = stats[level].correct;
+    const acc = att > 0 ? Math.round((corr / att) * 100) : 0;
+
+    document.getElementById(`${prefix}Attempted`).innerText = att;
+    document.getElementById(`${prefix}Correct`).innerText = corr;
+    document.getElementById(`${prefix}Acc`).innerText = `${acc}%`;
+}
+</script>
+
+</body>
+</html>
